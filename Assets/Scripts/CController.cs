@@ -7,6 +7,7 @@ public class CController : MonoBehaviour
     public List<AxleInfo> axleInfos;
     public float maxMotorTorque;
     public float maxSteeringAngle;
+    public float speedSteer=1;
 
     
     // находит визуальную часть колес
@@ -31,14 +32,16 @@ public class CController : MonoBehaviour
     public void FixedUpdate()
     {
         float motor = maxMotorTorque ;
-        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        float steering = maxSteeringAngle ;
 
         foreach (AxleInfo axleInfo in axleInfos)
         {
             if (axleInfo.steering)
             {
-                axleInfo.leftWheel.steerAngle = steering;
-                axleInfo.rightWheel.steerAngle = steering;
+                float trash = steering;
+                trash = Mathf.Clamp( trash * (Mathf.Abs(axleInfo.routerLeft.axisSpeed )- Mathf.Abs(axleInfo.routerRight.axisSpeed))*speedSteer, -maxSteeringAngle, maxSteeringAngle);
+                axleInfo.leftWheel.steerAngle =Mathf.Lerp(axleInfo.leftWheel.steerAngle,trash,0.1f);
+                axleInfo.rightWheel.steerAngle = Mathf.Lerp(axleInfo.rightWheel.steerAngle, trash, 0.1f); ;
             }
             if (axleInfo.motor)
             {
